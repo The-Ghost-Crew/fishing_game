@@ -9,12 +9,14 @@ const SAVE_KEY = 'fisher_save_v1';
 // ---------------- Data (placeholder — swap freely later) ----------------
 
 const FISH_DATA = [
-  { id: 'bluegill', name: 'Bluegill',        minKg: 0.10, maxKg: 0.50, struggle: 1, value: 5,  xp: 3,  rarity: 50, emoji: '🐟' },
-  { id: 'carp',     name: 'Pond Carp',       minKg: 0.50, maxKg: 2.00, struggle: 2, value: 12, xp: 8,  rarity: 30, emoji: '🐠' },
-  { id: 'catfish',  name: 'Small Catfish',   minKg: 1.00, maxKg: 3.50, struggle: 3, value: 20, xp: 15, rarity: 14, emoji: '🐡' },
-  { id: 'koi',      name: 'Koi',             minKg: 0.30, maxKg: 1.20, struggle: 2, value: 25, xp: 12, rarity: 5,  emoji: '🎏' },
-  { id: 'turtle',   name: 'Snapping Turtle', minKg: 2.00, maxKg: 6.00, struggle: 4, value: 40, xp: 30, rarity: 1,  emoji: '🐢' },
+  { id: 'bluegill', name: 'Bluegill',        minKg: 0.10, maxKg: 0.50, struggle: 1, value: 5,  xp: 3,  rarity: 50 },
+  { id: 'carp',     name: 'Pond Carp',       minKg: 0.50, maxKg: 2.00, struggle: 2, value: 12, xp: 8,  rarity: 30 },
+  { id: 'catfish',  name: 'Small Catfish',   minKg: 1.00, maxKg: 3.50, struggle: 3, value: 20, xp: 15, rarity: 14 },
+  { id: 'koi',      name: 'Koi',             minKg: 0.30, maxKg: 1.20, struggle: 2, value: 25, xp: 12, rarity: 5  },
+  { id: 'turtle',   name: 'Snapping Turtle', minKg: 2.00, maxKg: 6.00, struggle: 4, value: 40, xp: 30, rarity: 1  },
 ];
+
+const FISH_ICON = 'graphics/fish-icon.svg'; // one shared icon for the reel marker, catch popup, and shop lists
 
 const ROD_CATALOG = [
   { id: 'starter',    name: 'Starter Rod',    price: 40,  lureSpeed: 1, luck: 1, control: 0, resilience: 1, maxKg: 3.0, durability: 100, reqLevel: 1 },
@@ -236,18 +238,22 @@ function reelLoop(ts) {
   reel.fishPos += clamp(reel.fishTarget - reel.fishPos, -fishSpeed * dt * 30, fishSpeed * dt * 30);
   reel.fishPos = clamp(reel.fishPos, 2, 98);
 
-  // Bar physics: hold accelerates right, release decelerates back left
-  const accel = 90, drag = 70;
-  if (!reel.locked && reel.holding) {
-    reel.barVel += accel * dt;
-  } else {
-    reel.barVel -= drag * dt;
-  }
-  reel.barVel = clamp(reel.barVel, -60, 60);
-  reel.barPos += reel.barVel * dt;
+  // Bar physics: hold accelerates right, release decelerates back left.
+  // While locked, the bar holds still (no drift either way) so the player
+  // isn't starting the real attempt already yanked out of position.
   const half = reel.barWidth / 2;
-  if (reel.barPos - half < 0) { reel.barPos = half; reel.barVel = Math.max(0, reel.barVel); }
-  if (reel.barPos + half > 100) { reel.barPos = 100 - half; reel.barVel = Math.min(0, reel.barVel); }
+  if (!reel.locked) {
+    const accel = 90, drag = 70;
+    if (reel.holding) {
+      reel.barVel += accel * dt;
+    } else {
+      reel.barVel -= drag * dt;
+    }
+    reel.barVel = clamp(reel.barVel, -60, 60);
+    reel.barPos += reel.barVel * dt;
+    if (reel.barPos - half < 0) { reel.barPos = half; reel.barVel = Math.max(0, reel.barVel); }
+    if (reel.barPos + half > 100) { reel.barPos = 100 - half; reel.barVel = Math.min(0, reel.barVel); }
+  }
 
   // Progress: +/-12% per second based on overlap
   const inside = Math.abs(reel.fishPos - reel.barPos) <= half;
@@ -364,9 +370,9 @@ function resetSave() {
 // ---------------- Rendering ----------------
 
 function renderHUD() {
-  moneyDisplay.textContent = `💰 ${state.money}`;
+  moneyDisplay.innerHTML = `<img class="icon-inline" src="graphics/coin.svg" alt="coins"> ${state.money}`;
   const lvl = getLevel(state.xp);
-  levelDisplay.textContent = `⭐ Lv.${lvl} · ${state.xp} XP`;
+  levelDisplay.innerHTML = `<img class="icon-inline" src="graphics/star.svg" alt="level"> Lv.${lvl} · ${state.xp} XP`;
 
   const rod = getEquippedRod();
   const base = getRodCatalog(rod.catalogId);
@@ -381,7 +387,6 @@ function renderReel() {
   reelBar.style.left = (reel.barPos - reel.barWidth / 2) + '%';
   reelBar.style.width = reel.barWidth + '%';
   fishMarker.style.left = reel.fishPos + '%';
-  fishMarker.textContent = reel.fish.emoji;
   progressFill.style.width = reel.progress + '%';
 }
 
@@ -406,7 +411,7 @@ function renderShop() {
     } else if (locked) {
       action = `<span class="tag locked">Requires Lv.${cat.reqLevel}</span>`;
     } else {
-      action = `<button class="btn btn-accent" data-buyrod="${cat.id}" ${state.money < cat.price ? 'disabled' : ''}>Buy — ${cat.price}💰</button>`;
+      action = `<button class="btn btn-accent" data-buyrod="${cat.id}" ${state.money < cat.price ? 'disabled' : ''}>Buy — ${cat.price} <img class="icon-inline" src="graphics/coin.svg" alt="coins"></button>`;
     }
     return `<div class="shop-item">
       <div class="shop-item-info"><strong>${cat.name}</strong>
@@ -424,7 +429,7 @@ function renderShop() {
       <div class="shop-item-info"><strong>${cat.name}</strong> <span class="tag">Owned: ${owned}</span>
         <div class="stat-row">+${cat.luckBonus} Luck for one cast</div>
       </div>
-      ${locked ? `<span class="tag locked">Requires Lv.${cat.reqLevel}</span>` : `<button class="btn btn-accent" data-buybait="${cat.id}" ${state.money < cat.price ? 'disabled' : ''}>Buy — ${cat.price}💰</button>`}
+      ${locked ? `<span class="tag locked">Requires Lv.${cat.reqLevel}</span>` : `<button class="btn btn-accent" data-buybait="${cat.id}" ${state.money < cat.price ? 'disabled' : ''}>Buy — ${cat.price} <img class="icon-inline" src="graphics/coin.svg" alt="coins"></button>`}
     </div>`;
   }).join('');
 
@@ -443,8 +448,8 @@ function renderShop() {
     const rows = state.inventory.map((item, i) => {
       const fish = FISH_DATA.find(f => f.id === item.fishId);
       return `<div class="shop-item">
-        <div class="shop-item-info"><strong>${fish.emoji} ${fish.name}</strong> — ${item.weight.toFixed(2)}kg</div>
-        <button class="btn btn-accent" data-sell="${i}">Sell — ${fish.value}💰</button>
+        <div class="shop-item-info"><strong><img class="icon-fish" src="${FISH_ICON}" alt=""> ${fish.name}</strong> — ${item.weight.toFixed(2)}kg</div>
+        <button class="btn btn-accent" data-sell="${i}">Sell — ${fish.value} <img class="icon-inline" src="graphics/coin.svg" alt="coins"></button>
       </div>`;
     }).join('');
     tabSell.innerHTML = rows + `<button id="sellAllBtn" class="btn full-width" style="margin-top:10px;">Sell All</button>`;
@@ -456,7 +461,7 @@ function renderShop() {
   tabRepair.innerHTML = `
     <p>${base.name} damage: ${rod.damage}/${base.durability}</p>
     ${stats.isBroken ? `<p class="warn">Broken — every stat is 60% weaker until repaired.</p>` : ''}
-    <button id="repairBtn" class="btn btn-accent full-width" ${cost <= 0 || state.money < cost ? 'disabled' : ''}>${cost <= 0 ? 'No damage to repair' : 'Repair — ' + cost + '💰'}</button>
+    <button id="repairBtn" class="btn btn-accent full-width" ${cost <= 0 || state.money < cost ? 'disabled' : ''}>${cost <= 0 ? 'No damage to repair' : 'Repair — ' + cost + ' <img class="icon-inline" src="graphics/coin.svg" alt="coins">'}</button>
     <h3>Stats</h3>
     <p>Total caught: ${state.stats.totalCaught} · Reels snapped: ${state.stats.reelsSnapped}</p>
     <button id="resetBtn" class="danger-btn" style="margin-top:16px;">Reset save data</button>
