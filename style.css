@@ -83,6 +83,20 @@ html, body {
   white-space: nowrap;
 }
 
+.icon-inline {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  margin-right: 1px;
+}
+
+.icon-fish {
+  width: 24px;
+  height: auto;
+  vertical-align: -7px;
+  margin-right: 4px;
+}
+
 /* ---- Buttons ---- */
 .btn {
   font-family: var(--font-body);
@@ -222,7 +236,7 @@ html, body {
 }
 
 .reel-card, .modal-box {
-  width: 100%;
+  width: 92%;
   max-width: 460px;
   background: var(--wood);
   border-top: 1px solid rgba(232,176,75,0.3);
@@ -235,6 +249,13 @@ html, body {
   border: 1px solid rgba(232,176,75,0.25);
 }
 
+.reel-card {
+  max-width: 340px;
+  padding: 16px 16px 18px;
+  border-radius: 16px;
+  margin-bottom: 8vh;
+}
+
 @keyframes surface {
   from { transform: translateY(40px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
@@ -242,37 +263,39 @@ html, body {
 
 .reel-hint {
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(244,241,230,0.7);
-  margin: 0 0 16px;
+  margin: 0 0 12px;
 }
 
 .reel-track {
   position: relative;
-  height: 46px;
+  height: 38px;
   background: rgba(0,0,0,0.4);
-  border-radius: 10px;
+  border-radius: 9px;
   overflow: visible;
 }
 .reel-bar {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
+  top: 3px;
+  bottom: 3px;
   background: var(--foam);
-  border-radius: 8px;
+  border-radius: 7px;
   box-shadow: 0 0 12px rgba(244,241,230,0.5);
 }
 .fish-marker {
   position: absolute;
   top: 50%;
+  width: 26px;
+  height: auto;
   transform: translate(-50%, -50%);
-  font-size: 20px;
   transition: left 0.05s linear;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45));
 }
 
 .progress-track {
-  margin-top: 12px;
-  height: 8px;
+  margin-top: 10px;
+  height: 6px;
   border-radius: 999px;
   background: rgba(0,0,0,0.4);
   overflow: hidden;
@@ -284,6 +307,14 @@ html, body {
 }
 
 /* ---- Result modal ---- */
+.result-box { text-align: center; }
+.result-icon {
+  width: 64px;
+  height: auto;
+  display: block;
+  margin: 0 auto 10px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+}
 #resultTitle {
   font-family: var(--font-display);
   margin: 0 0 8px;
