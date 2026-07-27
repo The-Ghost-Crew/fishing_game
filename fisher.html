@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Fisher — Pond (Prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <header id="topbar">
+    <h1 id="gameTitle">Fisher</h1>
+    <div class="stats-bar">
+      <span id="moneyDisplay" class="stat-chip">💰 0</span>
+      <span id="levelDisplay" class="stat-chip">⭐ Lv.1 · 0 XP</span>
+      <button id="shopBtn" class="btn btn-accent">Shop</button>
+    </div>
+  </header>
+
+  <main id="pond">
+    <div class="ripple ripple-a"></div>
+    <div class="ripple ripple-b"></div>
+    <div class="ripple ripple-c"></div>
+
+    <div id="rodPanel">
+      <strong id="rodName">Starter Rod</strong>
+      <div class="durability-track"><div id="durabilityFill" class="durability-fill"></div></div>
+    </div>
+
+    <div id="dock">
+      <button id="castBtn" class="btn btn-cast">Cast Line</button>
+      <p id="waitIndicator" class="hidden">Something's circling the lure&hellip;</p>
+    </div>
+  </main>
+
+  <!-- Reeling minigame -->
+  <div id="reelOverlay" class="overlay hidden">
+    <div class="reel-card">
+      <p class="reel-hint">Hold anywhere to reel right — release to drift back</p>
+      <div class="reel-track">
+        <div id="reelBar" class="reel-bar"></div>
+        <div id="fishMarker" class="fish-marker">🐟</div>
+      </div>
+      <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Catch / result modal -->
+  <div id="resultModal" class="overlay hidden">
+    <div class="modal-box">
+      <h2 id="resultTitle"></h2>
+      <p id="resultDetail"></p>
+      <button id="resultCloseBtn" class="btn btn-accent full-width">Nice</button>
+    </div>
+  </div>
+
+  <!-- Shop -->
+  <div id="shopModal" class="overlay hidden">
+    <div class="modal-box shop-box">
+      <div class="shop-tabs">
+        <button class="tab-btn active" data-tab="buy">Buy</button>
+        <button class="tab-btn" data-tab="sell">Sell Fish</button>
+        <button class="tab-btn" data-tab="repair">Repair &amp; Stats</button>
+      </div>
+      <div class="tab-scroll">
+        <div id="tab-buy" class="tab-panel"></div>
+        <div id="tab-sell" class="tab-panel hidden"></div>
+        <div id="tab-repair" class="tab-panel hidden"></div>
+      </div>
+      <button id="shopCloseBtn" class="btn full-width">Close</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
