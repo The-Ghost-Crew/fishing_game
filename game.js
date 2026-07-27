@@ -168,6 +168,7 @@ function startCast() {
   if (castInProgress) return;
   castInProgress = true;
   castBtn.disabled = true;
+  shopBtn.disabled = true;
   waitIndicator.classList.remove('hidden');
 
   const rod = getEquippedRod();
@@ -317,6 +318,7 @@ function endReel(won) {
 function finishCastAttempt() {
   castInProgress = false;
   castBtn.disabled = false;
+  shopBtn.disabled = false;
 }
 
 function setHolding(v) { if (reel) reel.holding = v; }
