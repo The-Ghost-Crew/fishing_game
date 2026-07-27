@@ -40,6 +40,8 @@ function freshState() {
     selectedBaitId: 'worm',
     inventory: [],
     stats: { totalCaught: 0, reelsSnapped: 0 },
+    starterFreeRepairs: 3, // "insurance" — the free starter rod's first 3 repairs cost nothing
+    hasSeenReelTutorial: false,
   };
 }
 
@@ -101,10 +103,12 @@ function applyDamage(rodInstance, amount) {
   rodInstance.damage = Math.min(base.durability, rodInstance.damage + amount);
 }
 
-function repairCost(rodInstance) {
+function getRepairInfo(rodInstance) {
   const base = getRodCatalog(rodInstance.catalogId);
   const dmgRatio = rodInstance.damage / base.durability;
-  return Math.round(dmgRatio * 0.5 * base.price);
+  const normalCost = Math.round(dmgRatio * 0.5 * base.price);
+  const isFree = normalCost > 0 && rodInstance.catalogId === 'starter' && state.starterFreeRepairs > 0;
+  return { normalCost, isFree, cost: isFree ? 0 : normalCost };
 }
 
 function pickFish(luck) {
@@ -134,6 +138,8 @@ const durabilityFill = document.getElementById('durabilityFill');
 const castBtn = document.getElementById('castBtn');
 const waitIndicator = document.getElementById('waitIndicator');
 
+const tutorialModal = document.getElementById('tutorialModal');
+const tutorialStartBtn = document.getElementById('tutorialStartBtn');
 const reelOverlay = document.getElementById('reelOverlay');
 const reelBar = document.getElementById('reelBar');
 const fishMarker = document.getElementById('fishMarker');
@@ -175,6 +181,8 @@ function startCast() {
   }, wait * 1000);
 }
 
+let pendingReel = null;
+
 function beginReel() {
   const rod = getEquippedRod();
   const stats = getEffectiveStats(rod);
@@ -200,6 +208,18 @@ function beginReel() {
   }
 
   const barWidth = Math.min(70, 30 + stats.control * 6);
+  pendingReel = { fish, weight, barWidth, resilience: stats.resilience };
+
+  if (!state.hasSeenReelTutorial) {
+    tutorialModal.classList.remove('hidden');
+  } else {
+    launchReel();
+  }
+}
+
+function launchReel() {
+  const { fish, weight, barWidth, resilience } = pendingReel;
+  pendingReel = null;
 
   reel = {
     fish, weight,
@@ -207,7 +227,7 @@ function beginReel() {
     fishPos: 50, fishTarget: 50, fishTimer: 0,
     progress: 0, perfect: true, locked: true, elapsed: 0,
     holding: false,
-    resilience: stats.resilience, struggle: fish.struggle,
+    resilience, struggle: fish.struggle,
     lastFrame: null,
   };
 
@@ -353,9 +373,14 @@ function sellAll() {
 
 function repairRod() {
   const rod = getEquippedRod();
-  const cost = repairCost(rod);
-  if (cost <= 0 || state.money < cost) return;
-  state.money -= cost;
+  const info = getRepairInfo(rod);
+  if (info.normalCost <= 0) return;
+  if (!info.isFree && state.money < info.cost) return;
+  if (info.isFree) {
+    state.starterFreeRepairs -= 1;
+  } else {
+    state.money -= info.cost;
+  }
   rod.damage = 0;
   saveGame(); renderHUD(); renderShop();
 }
@@ -457,11 +482,17 @@ function renderShop() {
 
   const base = getRodCatalog(rod.catalogId);
   const stats = getEffectiveStats(rod);
-  const cost = repairCost(rod);
+  const info = getRepairInfo(rod);
+  const repairLabel = info.normalCost <= 0
+    ? 'No damage to repair'
+    : info.isFree
+      ? 'Free Repair (Insurance)'
+      : `Repair — ${info.cost} <img class="icon-inline" src="graphics/coin.svg" alt="coins">`;
   tabRepair.innerHTML = `
     <p>${base.name} damage: ${rod.damage}/${base.durability}</p>
     ${stats.isBroken ? `<p class="warn">Broken — every stat is 60% weaker until repaired.</p>` : ''}
-    <button id="repairBtn" class="btn btn-accent full-width" ${cost <= 0 || state.money < cost ? 'disabled' : ''}>${cost <= 0 ? 'No damage to repair' : 'Repair — ' + cost + ' <img class="icon-inline" src="graphics/coin.svg" alt="coins">'}</button>
+    ${rod.catalogId === 'starter' ? `<p class="tag">Starter Rod insurance: ${state.starterFreeRepairs} free repair${state.starterFreeRepairs === 1 ? '' : 's'} left</p>` : ''}
+    <button id="repairBtn" class="btn btn-accent full-width" ${info.normalCost <= 0 || (!info.isFree && state.money < info.cost) ? 'disabled' : ''}>${repairLabel}</button>
     <h3>Stats</h3>
     <p>Total caught: ${state.stats.totalCaught} · Reels snapped: ${state.stats.reelsSnapped}</p>
     <button id="resetBtn" class="danger-btn" style="margin-top:16px;">Reset save data</button>
@@ -484,6 +515,12 @@ function renderShop() {
 // ---------------- Wiring ----------------
 
 castBtn.onclick = startCast;
+tutorialStartBtn.onclick = () => {
+  tutorialModal.classList.add('hidden');
+  state.hasSeenReelTutorial = true;
+  saveGame();
+  launchReel();
+};
 resultCloseBtn.onclick = () => resultModal.classList.add('hidden');
 shopBtn.onclick = () => { renderShop(); shopModal.classList.remove('hidden'); };
 shopCloseBtn.onclick = () => shopModal.classList.add('hidden');
