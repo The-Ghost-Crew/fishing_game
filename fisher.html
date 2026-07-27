@@ -16,8 +16,8 @@
   <header id="topbar">
     <h1 id="gameTitle">Fisher</h1>
     <div class="stats-bar">
-      <span id="moneyDisplay" class="stat-chip">💰 0</span>
-      <span id="levelDisplay" class="stat-chip">⭐ Lv.1 · 0 XP</span>
+      <span id="moneyDisplay" class="stat-chip"><img class="icon-inline" src="graphics/coin.svg" alt="coins"> 0</span>
+      <span id="levelDisplay" class="stat-chip"><img class="icon-inline" src="graphics/star.svg" alt="level"> Lv.1 · 0 XP</span>
       <button id="shopBtn" class="btn btn-accent">Shop</button>
     </div>
   </header>
@@ -44,7 +44,7 @@
       <p class="reel-hint">Hold anywhere to reel right — release to drift back</p>
       <div class="reel-track">
         <div id="reelBar" class="reel-bar"></div>
-        <div id="fishMarker" class="fish-marker">🐟</div>
+        <img id="fishMarker" class="fish-marker" src="graphics/fish-icon.svg" alt="fish">
       </div>
       <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
     </div>
@@ -52,7 +52,8 @@
 
   <!-- Catch / result modal -->
   <div id="resultModal" class="overlay hidden">
-    <div class="modal-box">
+    <div class="modal-box result-box">
+      <img id="resultIcon" class="result-icon" src="graphics/fish-icon.svg" alt="">
       <h2 id="resultTitle"></h2>
       <p id="resultDetail"></p>
       <button id="resultCloseBtn" class="btn btn-accent full-width">Nice</button>
