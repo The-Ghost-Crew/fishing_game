@@ -8,19 +8,32 @@ const SAVE_KEY = 'fisher_save_v1';
 
 // ---------------- Data (placeholder — swap freely later) ----------------
 
+// Zone 1: Oregon Lake. Weight ranges grounded in real recreational-angling
+// data for each species; struggle/rarity/value/xp are game balance on top
+// of that. Sturgeon is intentionally near-uncatchable with early rods —
+// see ROD_CATALOG note below.
 const FISH_DATA = [
-  { id: 'bluegill', name: 'Bluegill',        minKg: 0.10, maxKg: 0.50, struggle: 1, value: 5,  xp: 3,  rarity: 50 },
-  { id: 'carp',     name: 'Pond Carp',       minKg: 0.50, maxKg: 2.00, struggle: 2, value: 12, xp: 8,  rarity: 30 },
-  { id: 'catfish',  name: 'Small Catfish',   minKg: 1.00, maxKg: 3.50, struggle: 3, value: 20, xp: 15, rarity: 14 },
-  { id: 'koi',      name: 'Koi',             minKg: 0.30, maxKg: 1.20, struggle: 2, value: 25, xp: 12, rarity: 5  },
-  { id: 'turtle',   name: 'Snapping Turtle', minKg: 2.00, maxKg: 6.00, struggle: 4, value: 40, xp: 30, rarity: 1  },
+  { id: 'smelt',    name: 'Smelt',           minKg: 0.02, maxKg: 0.09, struggle: 1, value: 3,   xp: 2,   rarity: 55 },
+  { id: 'bluegill', name: 'Bluegill',        minKg: 0.10, maxKg: 0.40, struggle: 1, value: 6,   xp: 3,   rarity: 45 },
+  { id: 'perch',    name: 'Yellow Perch',    minKg: 0.10, maxKg: 0.50, struggle: 1, value: 7,   xp: 4,   rarity: 40 },
+  { id: 'trout',    name: 'Rainbow Trout',   minKg: 0.30, maxKg: 2.50, struggle: 2, value: 14,  xp: 9,   rarity: 40 },
+  { id: 'crappie',  name: 'Black Crappie',   minKg: 0.15, maxKg: 0.90, struggle: 1, value: 10,  xp: 6,   rarity: 35 },
+  { id: 'bass',     name: 'Largemouth Bass', minKg: 0.40, maxKg: 3.00, struggle: 3, value: 22,  xp: 16,  rarity: 20 },
+  { id: 'carp',     name: 'Common Carp',     minKg: 1.50, maxKg: 9.00, struggle: 3, value: 20,  xp: 15,  rarity: 18 },
+  { id: 'kokanee',  name: 'Kokanee',         minKg: 0.20, maxKg: 1.50, struggle: 2, value: 28,  xp: 20,  rarity: 12 },
+  { id: 'steelhead',name: 'Steelhead',       minKg: 2.00, maxKg: 7.00, struggle: 4, value: 45,  xp: 35,  rarity: 6  },
+  { id: 'chinook',  name: 'Chinook Salmon',  minKg: 4.00, maxKg: 20.00,struggle: 4, value: 60,  xp: 45,  rarity: 5  },
+  { id: 'sturgeon', name: 'White Sturgeon',  minKg: 15.00,maxKg: 90.00,struggle: 5, value: 150, xp: 100, rarity: 1  },
 ];
 
 const FISH_ICON = 'graphics/fish-icon.svg'; // one shared icon for the reel marker, catch popup, and shop lists
 
 const ROD_CATALOG = [
   { id: 'starter',    name: 'Starter Rod',    price: 40,  lureSpeed: 1, luck: 1, control: 0, resilience: 1, maxKg: 3.0, durability: 100, reqLevel: 1 },
-  { id: 'reinforced', name: 'Reinforced Rod', price: 120, lureSpeed: 2, luck: 2, control: 2, resilience: 2, maxKg: 5.0, durability: 150, reqLevel: 2 },
+  // maxKg bumped 5.0 -> 8.0 so Steelhead (a "core" fish for this zone) is
+  // consistently landable, not a near-guaranteed snap. Chinook and Sturgeon
+  // still mostly exceed this on purpose -- reasons to want the next rod tier.
+  { id: 'reinforced', name: 'Reinforced Rod', price: 120, lureSpeed: 2, luck: 2, control: 2, resilience: 2, maxKg: 8.0, durability: 150, reqLevel: 2 },
 ];
 
 const BAIT_CATALOG = [
